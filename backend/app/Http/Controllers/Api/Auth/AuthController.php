@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\Auth\LoginResource;
+use App\Http\Resources\Auth\LoginUserResource;
 use App\Services\Auth\AuthService;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -53,5 +54,12 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out successfully.',
         ], Response::HTTP_OK);
+    }
+
+    public function getLoginUser(Request $request)
+    {
+        return (new LoginUserResource($request->user()))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 }
