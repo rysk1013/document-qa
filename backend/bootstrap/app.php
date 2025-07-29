@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Illuminate\Auth\AuthenticationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,6 +19,16 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->expectsJson()) {
+                logError($e->getMessage(), ['stack_trace' => $e->getTrace()]);
+
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+        });
+
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
             if ($request->expectsJson()) {
                 logError($e->getMessage(), ['stack_trace' => $e->getTrace()]);
