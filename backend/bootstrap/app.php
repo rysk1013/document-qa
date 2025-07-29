@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
             if ($request->expectsJson()) {
+                logError($e->getMessage(), ['stack_trace' => $e->getTrace()]);
+
                 return response()->json([
                     'message' => 'Method Not Allowed.',
                 ], Response::HTTP_METHOD_NOT_ALLOWED);
@@ -28,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->expectsJson()) {
+                logError($e->getMessage(), ['stack_trace' => $e->getTrace()]);
+
                 return response()->json([
                     'message' => 'An unexpected error occurred. Please try again later.',
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
